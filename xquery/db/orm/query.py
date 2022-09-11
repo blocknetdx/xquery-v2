@@ -63,11 +63,11 @@ class XQuery(BaseModelXQuery, Base):
     address_sender = Column(String(length=66))
     address_to = Column(String(length=66))
 
-    token0_name = Column(String(length=64))
-    token0_symbol = Column(String(length=16))
+    token0_name = Column(String(length=256))
+    token0_symbol = Column(String(length=256))
     token0_decimals = Column(SmallInteger)
-    token1_name = Column(String(length=64))
-    token1_symbol = Column(String(length=16))
+    token1_name = Column(String(length=256))
+    token1_symbol = Column(String(length=256))
     token1_decimals = Column(SmallInteger)
 
     # Approval, Transfer, Deposit, Withdrawal (RC20, WAVAX)

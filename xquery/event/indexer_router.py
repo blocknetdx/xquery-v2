@@ -181,8 +181,8 @@ class EventIndexer_Router(EventIndexerBase):
                 return None
 
             token = {
-                "name": name,
-                "symbol": symbol,
+                "name": str(name)[:64],
+                "symbol": str(symbol)[:16],
                 "decimals": int(decimals),
             }
 

@@ -36,6 +36,9 @@ cd xquery-v2-testing
 
 ```shell
 cp .env.template .env
+
+# Review the env variables set it .env; modify them if desired
+
 ./run.sh
 ```
 
@@ -82,15 +85,6 @@ psycopg2-binary==2.9.3
 Then issue once again:
 ```shell
 pip install -r requirements.txt
-```
-
-## Database
-
-Run the following commands to create the database tables.
-
-```shell
-alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
-alembic -n default -c alembic/alembic.ini upgrade head
 ```
 
 ### Configuration
@@ -156,6 +150,15 @@ AVAX running locally and you want to ensure AVAX indexing speed is not
 limited by the public source of AVAX blockchain data, you may wish to set the
 `API_URL` to something like `http://172.31.11.28:9650/ext/bc/C/rpc`
 ...where `172.31.11.28` is the IP of the local `avax` container.
+
+## Database
+
+Run the following commands to create the database tables.
+
+```shell
+alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
+alembic -n default -c alembic/alembic.ini upgrade head
+```
 
 ### Verify Setup
 

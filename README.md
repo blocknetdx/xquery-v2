@@ -1,29 +1,58 @@
 # XQuery v2.0
 
-## Setup For Testing Milestone 1
-
-Note: As of this writing, there is a minor bug in XQ v2.0 which prevents it
-from indexing the AVAX blockchain past block height 2433078.
+## Setup For Testing Milestones 1, 2 & 3
 
 ### Dependencies & Requirements
 
+- Linux Ubuntu 20.04 LTS (or similar)
 - python 3.8 or 3.9
 - docker version 20.10
 - docker compose version v2.3.4
 - alembic 1.8.0
+- running Web3 enabled node (e.g. ETH, AVAX, Sys NEVM.)
 - Ensure no containers or services are listening on any of the
   following ports: `5432`, `6379`, `8080`
 
 ### Clone This Repository and Enter Cloned Repo
 
 ```shell
-git clone https://github.com/blocknetdx/xquery-v2-testing
+# --recursive flag is needed while cloning to ensure the xquery2 submodule is  
+# also cloned.
+
+git clone --recursive https://github.com/blocknetdx/xquery-v2-testing
+
+# If this repo has previously been cloned and the original xquery2 repo
+# has since been updated, the xquery2 submodule in this repo can be
+# updated with:
+
+git submodule update
+
+# Enter the clone of the xquery-v2-testing repo:
+
 cd xquery-v2-testing
 ```
 
-### Set Up & Activate Virtual Environment
+### Launch Postgres, Redis & Hasura containers
 
 ```shell
+cp .env.template .env
+./run.sh
+```
+
+## Database
+
+Run the following commands to create the database tables.
+
+```shell
+alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
+alembic -n default -c alembic/alembic.ini upgrade head
+```
+
+### enter xquery2 submodule, set up & activate virtual environment
+
+```shell
+cd xquery2
+sudo apt install python3-virtualenv
 virtualenv -p python3 ./.venv
 source .venv/bin/activate
 
@@ -32,11 +61,24 @@ pip install -r requirements.txt
 
 #### Errors running pip install -r requirements.txt
 
-If `pip install -r requirements.txt` returns error messages about not
-being able to compile/install the package `psycopg2`, edit
-`requirements.txt` and change this line:
+If you get errors running `pip install -r requirements.txt`, see the
+following:
+
+> XQuery requires the `psycopg2` python package, which is compiled from source and thus has 
+> additional system prerequisites (C compiler, system dev packages).
+> See [here](https://www.psycopg.org/docs/install.html#install-from-source).
+
+The required system packages can be install with:
+```shell
+sudo apt install build-essential python3-dev libpq-dev gcc
 ```
-psycopg2[binary]==2.9.3
+
+> Alternatively, install the precompiled `psycopg2-binary` python
+> package instead, like this:
+
+Edit `requirements.txt` and change this line:
+```
+psycopg2==2.9.3
 ```
 to this:
 ```
@@ -49,81 +91,102 @@ pip install -r requirements.txt
 
 ### Configuration
 
-All configurable settings are consolidated in `xquery/config.py`. Generally, no other files need to be modified!
-The `xquery/config.py` file included in this repo should be considered
+All configurable settings are consolidated in `xquery2/xquery/config.py`. Generally, no other files need to be modified!
+
+The following options (with default value) are available and can be adjusted in the configuration file.
+Alternatively, each option can also be set via its corresponding env variable. See details bellow:
+
+```python
+CONFIG = {
+    # Database settings
+    "DB_HOST": os.getenv("DB_HOST", "localhost"),
+    "DB_PORT": os.getenv("DB_PORT", 5432),
+    "DB_USERNAME": os.getenv("DB_USERNAME", "root"),
+    "DB_PASSWORD": os.getenv("DB_PASSWORD", "password"),
+    "DB_DATABASE": os.getenv("DB_DATABASE", "debug"),
+    "DB_SCHEMA": os.getenv("DB_SCHEMA", "public"),
+
+    # Redis cache settings
+    "REDIS_HOST": os.getenv("REDIS_HOST", "localhost"),
+    "REDIS_PORT": os.getenv("REDIS_PORT", 6379),
+    "REDIS_PASSWORD": os.getenv("REDIS_PASSWORD", "password"),
+    "REDIS_DATABASE": os.getenv("REDIS_DATABASE", 0),
+
+    # Controller
+    "XQ_NUM_WORKERS": os.getenv("XQ_NUM_WORKERS", 8),
+    
+    # web3 provider RPC url
+    "API_URL": os.getenv("API_URL", "http://localhost:8545/"),
+    # "API_URL": os.getenv("API_URL", "https://cloudflare-eth.com/v1/mainnet"),  # ETH
+    # "API_URL": os.getenv("API_URL", "https://api.avax.network/ext/bc/C/rpc"),  # AVAX
+    # "API_URL": os.getenv("API_URL", "https://rpc.syscoin.org/"),  # SYS
+}
+```
+
+The `xquery2/xquery/config.py` file included in this repo should be considered
 as an example/template. Feel free to change configs as desired.
 For example, the web3 provider RPC URLs in this template config are as
 follows:
 ```py
     # web3 provider RPC url
-    "API_URL": {
-        "ETH": None,
-        "AVAX": "https://api.avax.network/ext/bc/C/rpc",
-        "SYS": "https://rpc.syscoin.org/",
-    },
+    "API_URL": os.getenv("API_URL", "http://localhost:8545/"),
+    # "API_URL": os.getenv("API_URL", "https://cloudflare-eth.com/v1/mainnet"),  # ETH
+    # "API_URL": os.getenv("API_URL", "https://api.avax.network/ext/bc/C/rpc"),  # AVAX
+    # "API_URL": os.getenv("API_URL", "https://rpc.syscoin.org/"),  # SYS
 ```
-This configures XQ to fetch blockchain data for AVAX from the public
-AVAX blockchain source, "https://api.avax.network/ext/bc/C/rpc". That
-works fine, but that source of AVAX data is rate limited. If you have
+Setting `API_URL` as above configures XQuery to fetch blockchain data from
+http://localhost:8545/ . This will work well if you plan to test XQ's
+indexing of Sys NEVM chain and Sys NEVM is
+running locally and the blockchain data of NEVM is available via RPC
+calls to port 8545 of *localhost*. But if NEVM is not running locally,
+you might want to set the `API_URL` to https://rpc.syscoin.org/. 
+If you want to test indexing of AVAX while gathering AVAX blockchain data from the public
+AVAX blockchain source, "https://api.avax.network/ext/bc/C/rpc", you
+can set your `API_URL` to that. That works fine, but that public
+source of AVAX data is rate limited. If you have
 AVAX running locally and you want to ensure AVAX indexing speed is not
-limited by the source of AVAX blockchain data, you may wish to change
-this section of the config file to be something like this:
-```py
-    # web3 provider RPC url
-    "API_URL": {
-        "ETH": None,
-        "AVAX": "http://172.31.11.28:9650/ext/bc/C/rpc",
-        "SYS": "https://rpc.syscoin.org/",
-    },
-```
+limited by the public source of AVAX blockchain data, you may wish to set the
+`API_URL` to something like `http://172.31.11.28:9650/ext/bc/C/rpc`
 ...where `172.31.11.28` is the IP of the local `avax` container.
-If you are running a local SYS container or ETH container, you may
-wish to also adjust their web3 provider RPC URLs to reference local,
-unlimited rate sources.
 
-### Launch Postgres, Redis & Hasura containers
+### Verify Setup
 
-```shell
-cd contrib
-cp .env.template .env
-./run.sh
-cd ..
-```
-
-## Database
-
-Run the following commands to create the database tables.
+Optionally, test the environment and configuration:
 
 ```shell
-alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
-alembic -n default -c alembic/alembic.ini upgrade head
+python -m test_setup
 ```
 
-### Run Example
+## Run Example
+
+Run one of the preconfigured examples, Pangolin (PNG) Exchange on Avalanche or Pegasys (PSYS) Exchange on Syscoin:
 
 ```shell
-python -m run 2> run.log &
+python -m run_png 2> run_png.log &
+python -m run_psys 2> run_psys.log &
 ```
-The above command starts the indexing of AVAX blockchain into a
+
+The above commands start the indexing of AVAX/Sys NEVM blockchain into a
 database stored on a (temporary) volume attached to the `xquery-pg`
-(postgres) container. (Modify `run.py` before issuing this command to have it index other EVMs.)
-Logs generated by `python -m run` are streamed to STDERR, which is why
-this example redirects STDERR to a file with `2> run.log`, and runs the
-`run` module in the background with `&` at the end.
+(postgres) container.
+Logs generated by `python -m run_png/psys` are streamed to STDERR, which is why
+this example redirects STDERR to a `.log` file with `2> run_png/psys.log`, and runs the
+`run_png/psys` module in the background with `&` at the end.
+
 To watch the streaming logs, you can issue:
 ```shell
-tail -f run.log
+tail -f run_png/psys.log
 ```
 Then issue ^C to interrupt the scrolling logs.
 To interrupt the `python -m run` command:
 ```shell
-# bring the python -m run process to the foreground:
+# bring the run_png/psys process to the foreground:
 fg
-# then interrupt the python -m run process by issuing (at least one) ^C
+# then interrupt the process by issuing (at least one) ^C
 ```
 
-(Instead of issuing `python -m run 2> run.log &`, one could alternatively open a `tmux` window, activate the same
-virtual environment there with `source .venv/bin/activate`, then issue `python -m run` in the tmux
+(Instead of issuing `python -m run_png/psys 2> run_png/psys.log &`, one could alternatively open a `tmux` window, activate the same
+virtual environment there with `source .venv/bin/activate`, then issue `python -m run_png/psys` in the tmux
 window and let the logs scroll within the tmux window.)
 
 ### Verify Indexed Data in Hasura Console
@@ -175,17 +238,24 @@ located on the Hasura Console screen:
 
 > WARNING: Some tests currently affect the state of the cache and database. Only run on a development setup!
 
+> Some tests only run on Avalanche (AVAX) currently
+
 ```shell
 pytest --collect-only tests/
-pytest --collect-only -k="cache" tests/
 
 pytest -v tests/
+pytest -v -rP tests/
+
 pytest -v -k="cache" tests/
+pytest -v -k="filter" tests/
+pytest -v -k="indexer" tests/
+pytest -v -k="middleware" tests/
 ```
 
 ## Benchmarks
 
 ```shell
+python -m bench.bench_cache_redis
 python -m bench.bench_fetch_token
 python -m bench.bench_fetch_token_batched
 python -m bench.bench_get_block

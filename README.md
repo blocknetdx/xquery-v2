@@ -156,9 +156,16 @@ limited by the public source of AVAX blockchain data, you may wish to set the
 Run the following commands to create the database tables.
 
 ```shell
-alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
+alembic -n default -c alembic/alembic.ini revision --autogenerate -m
+'creating schema'
+
 alembic -n default -c alembic/alembic.ini upgrade head
 ```
+NOTE, If the first `alembic` command above returns an error like this: 
+`ERROR [alembic.util.messaging] Target database is not up to date.`
+it means you have already run that `alembic` command in this environment, so 
+you can skip running that alembic command and go directly to the second 
+`alembic` command. 
 
 ### Verify Setup
 
@@ -173,6 +180,7 @@ is correct:
 06:09:17.0905 INFO  [MainThread 2178926] xquery.util.misc: Processing
 time of 'main()': 0.3918 seconds.
 ```
+If it returns errors, there are errors in the setup.
 
 ## Run Example
 
@@ -247,10 +255,11 @@ this:
 On this screen you should see an option to track a number of available
 tables. Click, "Track All"
 
-The main table of interest is the `xquery` table, which is where
-you can query for indexed EVM data. Some other tables, such as the `indexer_state` table might
-also be of interest, as it provides data about the most recently
-indexed block.
+In the previous version of `xquery2`, the main table of interest was the `xquery` table, which is where
+one could query for a variety of indexed EVM data. It seems the
+`xquery` table is not utilized or populated in the latest version of
+`xquery2` (confirming this now w/ Riku...), but lots of interesting data is
+available for querying in the other tables and aggregates.
 
 ## Tests
 

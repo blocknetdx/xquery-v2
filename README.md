@@ -156,13 +156,12 @@ limited by the public source of AVAX blockchain data, you may wish to set the
 Run the following commands to create the database tables.
 
 ```shell
-alembic -n default -c alembic/alembic.ini revision --autogenerate -m
-'creating schema'
+alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
 
 alembic -n default -c alembic/alembic.ini upgrade head
 ```
-NOTE, If the first `alembic` command above returns an error like this: 
-`ERROR [alembic.util.messaging] Target database is not up to date.`
+NOTE, If the first `alembic` command above returns an error like this:<br>
+`ERROR [alembic.util.messaging] Target database is not up to date.`<br>
 it means you have already run that `alembic` command in this environment, so 
 you can skip running that alembic command and go directly to the second 
 `alembic` command. 

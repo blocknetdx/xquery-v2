@@ -1,3 +1,4 @@
 [submodule "xquery2"]
 	url = https://github.com/blocknetdx/xquery2
 	path = xquery2
+	branch = master

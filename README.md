@@ -148,7 +148,7 @@ can set your `API_URL` to that. That works fine, but that public
 source of AVAX data is rate limited. If you have
 AVAX running locally and you want to ensure AVAX indexing speed is not
 limited by the public source of AVAX blockchain data, you may wish to set the
-`API_URL` to something like `http://172.31.11.28/ext/bc/C/rpc:9650`
+`API_URL` to something like `http://172.31.11.28:9650/ext/bc/C/rpc`
 ...where `172.31.11.28` is the IP of the local `avax` container.
 
 ## Database

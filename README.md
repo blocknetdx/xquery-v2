@@ -241,7 +241,7 @@ In the same avax/pangolin window, launch the indexer:
 ```shell
 DB_SCHEMA="xgraph_png" API_URL="http://<avax-container-IP>:9650/ext/bc/C/rpc" REDIS_DATABASE=0 python -m run_png 2> run_png.log &
 ```
-(If avax is running locally, replace <avax-container-IP> with the IP of the local avax container, which can be found like this:
+(If avax is running locally, replace `<avax-container-IP>` with the IP of the local avax container, which can be found like this:
 ```shell
 docker inspect exrproxy-env-avax-1 | grep IPv4
 ```
@@ -256,7 +256,7 @@ In the same Syscoin NEVM/Pegasys window, launch the indexer:
 ```shell
 DB_SCHEMA="xgraph_psys" API_URL="http://<SYS-container-IP>:8545/" REDIS_DATABASE=1 python -m run_psys 2> run_psys.log &
 ```
-(If SYS is running locally, replace <SYS-container-IP> with the IP of the local SYS container, which can be found like this:
+(If SYS is running locally, replace `<SYS-container-IP>` with the IP of the local SYS container, which can be found like this:
 ```shell
 docker inspect exrproxy-env-SYS-1 | grep IPv4
 ```
@@ -303,7 +303,7 @@ tables. Click, "Track All"
 In the previous version of `xquery2`, the main table of interest was the `xquery` table, which is where
 one could query for a variety of indexed EVM data. It seems the
 `xquery` table is not utilized or populated in the latest version of
-`xquery2` (confirming this now w/ Riku...), but lots of interesting data is
+`xquery2` (confirmed w/ Riku), but lots of interesting data is
 available for querying in the other tables and aggregates.
 
 ## Tests

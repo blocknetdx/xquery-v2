@@ -150,10 +150,15 @@ AVAX running locally and you want to ensure AVAX indexing speed is not
 limited by the public source of AVAX blockchain data, you may wish to set the
 `API_URL` to something like `http://172.31.11.28:9650/ext/bc/C/rpc`
 ...where `172.31.11.28` is the IP of the local `avax` container.
+NOTE: the values of the environment variables like `API_URL` set in `xquery2/xquery/config.py`
+can be overridden by passing the env variable on the command line. See [Run Multiple Instances Simultaneously](/#run-multiple-instances-simultaneously) for examples.
 
 ## Database
 
-Run the following commands to create the database tables.
+## Basic Example - index *only one* blockchain
+(Skip to [Run Multiple Instances Simultaneously](/#run-multiple-instances-simultaneously) if you plan to run indexing on multiple chains simultaneously).
+
+Run the following commands to create the database tables:
 
 ```shell
 alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema'
@@ -213,12 +218,48 @@ To interrupt the `python -m run_png` or `python -m run_psys` command:
 
 fg
 
-# then interrupt the process by issuing (at least one) ^C
+# then interrupt the process by issuing ^C
 ```
 
 (Instead of issuing `python -m run_png 2> run_png.log &` or `python -m run_psys 2> run_psys.log &`, one could alternatively open a `tmux` window, activate the same
 virtual environment there with `source .venv/bin/activate`, then issue
 `python -m run_png` or `python -m run_psys` in the tmux window and let the logs scroll within the tmux window.)
+
+## Run Multiple Instances Simultaneously example
+
+In a terminal window (or tmux window) dedicated to indexing avax/pangolin, run the following commands in the `xquery2` dir to create a separate database schema for Pangolin.
+Note, when you launch a new terminal window, `.venv` won't be activated, so you'll need to issue this command in the `xquery2` directory:
+```shell
+./.venv/bin/activate
+```
+Create a database schema for Pangolin:
+```shell
+DB_SCHEMA="xgraph_png" alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema for Pangolin'
+alembic -n default -c alembic/alembic.ini upgrade head
+```
+In the same avax/pangolin window, launch the indexer:
+```shell
+DB_SCHEMA="xgraph_png" API_URL="http://<avax-container-IP>:9650/ext/bc/C/rpc" REDIS_DATABASE=0 python -m run_png 2> run_png.log &
+```
+(If avax is running locally, replace <avax-container-IP> with the IP of the local avax container, which can be found like this:
+```shell
+docker inspect exrproxy-env-avax-1 | grep IPv4
+```
+
+Then, in a new terminal window dedicated to Syscoin NEVM/Pegasys indexing, run the following commands in the `xquery2` dir to create a separate database schema for Pegasys.
+Note, when you launch a new terminal window, `.venv` won't be activated, so you'll need to issue this command in the `xquery2` directory:
+```shell
+./.venv/bin/activate
+```
+In the same Syscoin NEVM/Pegasys window, launch the indexer:
+
+```shell
+DB_SCHEMA="xgraph_psys" API_URL="http://<SYS-container-IP>:8545/" REDIS_DATABASE=1 python -m run_psys 2> run_psys.log &
+```
+(If SYS is running locally, replace <SYS-container-IP> with the IP of the local SYS container, which can be found like this:
+```shell
+docker inspect exrproxy-env-SYS-1 | grep IPv4
+```
 
 ### Verify Indexed Data in Hasura Console
 

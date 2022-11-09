@@ -251,6 +251,11 @@ Note, when you launch a new terminal window, `.venv` won't be activated, so you'
 ```shell
 ./.venv/bin/activate
 ```
+Create a database schema for Pegasys:
+```shell
+DB_SCHEMA="xgraph_psys" alembic -n default -c alembic/alembic.ini revision --autogenerate -m 'creating schema for Pegasys'
+alembic -n default -c alembic/alembic.ini upgrade head
+```
 In the same Syscoin NEVM/Pegasys window, launch the indexer:
 
 ```shell

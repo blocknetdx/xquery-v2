@@ -149,14 +149,14 @@ source of AVAX data is rate limited. If you have
 AVAX running locally and you want to ensure AVAX indexing speed is not
 limited by the public source of AVAX blockchain data, you may wish to set the
 `API_URL` to something like `http://172.31.11.28:9650/ext/bc/C/rpc`
-...where `172.31.11.28` is the IP of the local `avax` container.
+...where `172.31.11.28` is the IP of the local `avax` container.<br>
 NOTE: the values of the environment variables like `API_URL` set in `xquery2/xquery/config.py`
-can be overridden by passing the env variable on the command line. See [Run Multiple Instances Simultaneously](/#run-multiple-instances-simultaneously) for examples.
+can be overridden by passing the env variable on the command line. See [Run Multiple Instances Simultaneously](#run-multiple-instances-simultaneously) for examples.
 
 ## Database
 
 ## Basic Example - index *only one* blockchain
-(Skip to [Run Multiple Instances Simultaneously](/#run-multiple-instances-simultaneously) if you plan to run indexing on multiple chains simultaneously).
+(Skip to [Run Multiple Instances Simultaneously](#run-multiple-instances-simultaneously) if you plan to run indexing on multiple chains simultaneously).
 
 Run the following commands to create the database tables:
 

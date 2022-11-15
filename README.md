@@ -268,15 +268,6 @@ docker inspect exrproxy-env-SYS-1 | grep IPv4
 
 ### Verify Indexed Data in Hasura Console
 
-#### Optional hasura basic config (recommended)
-
-Optionally, a very basic configuration can be applied to Hasura by using the following script
-This needs to be run from the project root directory (`xquery2`) with *venv* activated:
-
-```shell
-python -m contrib.init_hasura
-```
-
 Find the IP of the server where XQuery v2 is running:
 ```
 curl ifconfig.co
@@ -295,8 +286,6 @@ specific blocks through this GUI, then compare the query results to
 the information given in Blockchain Explorers.
 
 #### Track Tables in Hasura Console
-
-If you did not apply the Optional hasura basic config above, the following applies:
 
 The first time you navigate in a web browser to
 `http://<SERVER-IP>:8080/console`, you'll probably see the message,

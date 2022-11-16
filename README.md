@@ -230,7 +230,7 @@ virtual environment there with `source .venv/bin/activate`, then issue
 In a terminal window (or tmux window) dedicated to indexing avax/pangolin, run the following commands in the `xquery2` dir to create a separate database schema for Pangolin.
 Note, when you launch a new terminal window, `.venv` won't be activated, so you'll need to issue this command in the `xquery2` directory:
 ```shell
-./.venv/bin/activate
+source .venv/bin/activate
 ```
 Create a database schema for Pangolin:
 ```shell
@@ -249,7 +249,7 @@ docker inspect exrproxy-env-avax-1 | grep IPv4
 Then, in a new terminal window dedicated to Syscoin NEVM/Pegasys indexing, run the following commands in the `xquery2` dir to create a separate database schema for Pegasys.
 Note, when you launch a new terminal window, `.venv` won't be activated, so you'll need to issue this command in the `xquery2` directory:
 ```shell
-./.venv/bin/activate
+source .venv/bin/activate
 ```
 Create a database schema for Pegasys:
 ```shell

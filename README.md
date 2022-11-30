@@ -302,8 +302,10 @@ this:
 
 ![Hasura Console 2](https://github.com/blocknetdx/xquery-v2-testing/blob/main/img/hasura-2.png?raw=true) 
 
-On this screen you should see an option to track a number of available
-tables. Click, "Track All"
+On this screen you should see an option to track the available
+tables and views. Click "Track All".
+
+After the previous step is completed you should then see an option just below to track 'foreign key relationships'. Click "Track All".
 
 In the previous version of `xquery2`, the main table of interest was the `xquery` table, which is where
 one could query for a variety of indexed EVM data. It seems the
